@@ -1,0 +1,6 @@
+{:name "lexicon-vertico"
+ :version "0.1.0"
+ :description "Vertical completion UI for Lexicon"
+ :entry lexicon.vertico.core
+ :lexicon-version ">=0.1.0"
+ :dependencies []}
