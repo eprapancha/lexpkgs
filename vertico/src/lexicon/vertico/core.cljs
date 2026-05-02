@@ -16,6 +16,7 @@
                                   minibuffer-completion-table
                                   minibuffer-completion-predicate
                                   completion-metadata
+                                  completion-metadata-get
                                   set-minibuffer-input
                                   update-minibuffer-frame
                                   set-completion-display
@@ -68,15 +69,20 @@
         candidates (if table
                      (vec (all-completions (or input "") table predicate))
                      [])
-        ;; Get metadata for sorting/annotation
-        metadata (completion-metadata (or input ""))
+        ;; Get metadata for sorting/annotation (3-arg form: string, table, predicate)
+        metadata (completion-metadata (or input "") table predicate)
         ;; Apply display-sort-function if available
+        ;; Metadata sort functions can be keywords (:alphabetical, :recent-first)
+        ;; or actual functions. Only call if it's a real function.
         sort-fn (when (map? metadata) (:display-sort-function metadata))
-        sorted (if sort-fn
-                 (vec (sort-fn candidates))
-                 candidates)
-        ;; Get annotation function
-        annotation-fn (when (map? metadata) (:annotation-function metadata))
+        sorted (cond
+                 (fn? sort-fn) (vec (sort-fn candidates))
+                 (= sort-fn :alphabetical) (vec (sort candidates))
+                 :else candidates)
+        ;; Get annotation function — only use if it's a callable function
+        annotation-fn (when (and (map? metadata)
+                                 (fn? (:annotation-function metadata)))
+                        (:annotation-function metadata))
         total (count sorted)
         {:keys [count scroll-margin index scroll]} @state
         ;; Reset index if input changed
