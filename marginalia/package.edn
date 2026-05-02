@@ -1,0 +1,6 @@
+{:name "lexicon-marginalia"
+ :version "0.1.0"
+ :description "Rich annotations for minibuffer completion candidates"
+ :entry lexicon.marginalia.core
+ :lexicon-version ">=0.1.0"
+ :dependencies ["vertico"]}
