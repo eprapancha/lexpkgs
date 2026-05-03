@@ -222,6 +222,24 @@
 ;; Package Entry Points
 ;; =============================================================================
 
+;; =============================================================================
+;; Candidate Collection (for consult/embark integration)
+;; =============================================================================
+
+(defn- get-current-candidate
+  "Return the currently highlighted candidate in Vertico.
+  Used by consult--completion-candidate-hook."
+  [& _args]
+  (let [{:keys [index candidates]} @state]
+    (when (and (>= index 0) (< index (count candidates)))
+      (nth candidates index))))
+
+(defn- get-all-candidates
+  "Return all current candidates in Vertico.
+  Used by embark-candidate-collectors."
+  [& _args]
+  (:candidates @state))
+
 (defn initialize!
   "Initialize Vertico. Called when the package is loaded."
   []
@@ -233,6 +251,9 @@
   (add-hook 'vertico-next-hook on-next)
   (add-hook 'vertico-prev-hook on-prev)
   (add-hook 'vertico-insert-hook on-insert)
+  ;; Register candidate collection hooks (for consult/embark)
+  (add-hook 'consult--completion-candidate-hook get-current-candidate)
+  (add-hook 'embark-candidate-collectors get-all-candidates)
   (message "Vertico loaded"))
 
 (defn cleanup!
@@ -244,5 +265,8 @@
   (remove-hook 'vertico-next-hook on-next)
   (remove-hook 'vertico-prev-hook on-prev)
   (remove-hook 'vertico-insert-hook on-insert)
+  ;; Remove candidate collection hooks
+  (remove-hook 'consult--completion-candidate-hook get-current-candidate)
+  (remove-hook 'embark-candidate-collectors get-all-candidates)
   (set-completion-display nil)
   (message "Vertico unloaded"))
