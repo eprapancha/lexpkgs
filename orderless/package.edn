@@ -1,0 +1,6 @@
+{:name "lexicon-orderless"
+ :version "0.1.0"
+ :description "Orderless completion style for Lexicon"
+ :entry lexicon.orderless.core
+ :lexicon-version ">=0.1.0"
+ :dependencies []}

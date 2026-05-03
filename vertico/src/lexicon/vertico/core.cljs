@@ -12,6 +12,7 @@
   - Navigation keys routed through vertico-*-hook hooks"
   (:require [lexicon.api :refer [message add-hook remove-hook
                                   all-completions
+                                  completion-all-completions
                                   minibuffer-contents-no-properties
                                   minibuffer-completion-table
                                   minibuffer-completion-predicate
@@ -65,9 +66,11 @@
   [input]
   (let [table (minibuffer-completion-table)
         predicate (minibuffer-completion-predicate)
-        ;; Get all matching completions
+        ;; Get all matching completions using style-aware filtering
         candidates (if table
-                     (vec (all-completions (or input "") table predicate))
+                     (let [result (completion-all-completions
+                                   (or input "") table predicate nil nil)]
+                       (vec (or result [])))
                      [])
         ;; Get metadata for sorting/annotation (3-arg form: string, table, predicate)
         metadata (completion-metadata (or input "") table predicate)
