@@ -297,7 +297,10 @@
                   current (current-buffer)]
               (filterv (fn [name]
                          (and (not= name current)
-                              (not (.startsWith name " "))))
+                              (not (.startsWith name " "))
+                              (let [buf-id (get-buffer name)]
+                                (or (nil? buf-id)
+                                    (not (buffer-modified-p-of buf-id))))))
                        bufs)))
    :action (fn [candidate]
              (switch-to-buffer candidate))
